@@ -27,14 +27,19 @@ class TestGithubOrgClient(unittest.TestCase):
         cli = GithubOrgClient(org)
         with patch.object(cli, 'get_json') as get_json:
             cli.org()
-            get_json.assert_called_once_with(f"https://api.github.com/orgs/{org_name}")
+            get_json.assert_called_once_with(
+                f"https://api.github.com/orgs/{org_name}"
+                )
 
     def test_public_repos_url(self):
         """
         memoize turns methods into properties. Read up
         on how to mock a property (see resource).
         """
-        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock:
+        with patch(
+            "client.GithubOrgClient.org",
+            new_callable=PropertyMock
+        ) as mock:
             mock.return_value = {
                 'repos_url': "https://api.github.com/users/google/repos",
             }
