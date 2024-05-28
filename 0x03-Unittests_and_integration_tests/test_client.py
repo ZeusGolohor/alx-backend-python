@@ -18,6 +18,7 @@ class TestGithubOrgClient(unittest.TestCase):
         ("google",),
         ("abc",)
     ])
+    @patch('client.GithubOrgClient.get_json')
     def test_org(self, org):
         """
         A TestGithubOrgClient(unittest.TestCase) class
