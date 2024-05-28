@@ -42,3 +42,54 @@ class TestGithubOrgClient(unittest.TestCase):
                 GithubOrgClient("google")._public_repos_url,
                 "https://api.github.com/users/google/repos",
             )
+
+    @patch("client.get_json")
+    def test_public_repos(self, mock_get_json: MagicMock) -> None:
+        """
+        A TestGithubOrgClient.test_public_repos to
+        unit-test GithubOrgClient.public_repos.
+        """
+        test_payload = {
+            'repos_url': "https://api.github.com/users/google/repos",
+            'repos': [
+                {
+                        "id": 460600860,
+                        "node_id": "R_kgDOG3Q2HA",
+                        "name": ".allstar",
+                        "full_name": "google/.allstar",
+                        "private": false,
+                        "owner": {
+                            "login": "google",
+                            "id": 1342004,
+                            "node_id": "MDEyOk9yZ2FuaXphdGlvbjEzNDIwMDQ=",
+                        }
+                },
+                {
+                        "id": 170908616,
+                        "node_id": "MDEwOlJlcG9zaXRvcnkxNzA5MDg2MTY=",
+                        "name": ".github",
+                        "full_name": "google/.github",
+                        "private": false,
+                        "owner": {
+                            "login": "google",
+                            "id": 1342004,
+                            "node_id": "MDEyOk9yZ2FuaXphdGlvbjEzNDIwMDQ=",
+                        }
+                }
+            ]
+        }
+        mock_get_json.return_value = test_payload["repos"]
+        with patch(
+            "client.GithubOrgClient._public_repos_url",
+            new_callable=PropertyMock,
+        ) as mock_public_url:
+            mock_public_url.return_value = test_payload['repos_url']
+            self.assertEqual(
+                GithubOrgClient("google").public_repos(),
+                [
+                    '.allstar',
+                    '.github',
+                ],
+            )
+            mock_public_url.assert_called_once()
+        mock_get_json.assert_called_once()
