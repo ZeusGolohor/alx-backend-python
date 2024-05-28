@@ -46,19 +46,16 @@ class TestGetJson(unittest.TestCase):
     the TestGetJson.test_get_json method to test that utils.get_json
     returns the expected result.
     """
-    @patch('utils.requests.get')
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False})
     ])
-    def test_get_json(self, test_url, test_payload, mock_get):
+    def test_get_json(self, test_url, test_payload):
         """
         TestGetJson.test_get_json method to test that utils.get_json
         returns the expected result.
         """
-        mock_res = Mock()
-        mock_res.json.return_value = test_payload
-        mock_get.return_value = mock_res
-        res = get_json(test_url)
-        mock_get.assert_called_once_with(test_url)
-        self.assertEqual(res, test_payload)
+        attributes = {'json.return_value': test_payload}
+        with patch("requests.get", return_value=Mock(**attributes)) as request:
+            self.assertEqual(get_json(test_url), test_payload)
+            request.assert_called_once_with(test_url)
